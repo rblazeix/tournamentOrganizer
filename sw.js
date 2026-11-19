@@ -1,4 +1,4 @@
-const CACHE = 'tournoi-v5';
+const CACHE = 'tournoi-v6';
 const FILES = ['./', 'index.html', 'styles.css', 'src/draw.js', 'src/score.js', 'src/store.js', 'src/app.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));

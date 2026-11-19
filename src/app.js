@@ -103,7 +103,6 @@
   }
 
   function rankingView() {
-    const st = Draw.stats(state.rotations);
     const tbl = {};
     const row = id => (tbl[id] = tbl[id] || { id, played: 0, wins: 0, diff: 0 });
     for (const r of state.rotations) for (const m of r.matches) {
@@ -115,8 +114,31 @@
     }
     const list = Object.values(tbl).sort((a, b) => b.wins - a.wins || b.diff - a.diff);
     if (!list.length) return '<p class="muted">Saisis des scores dans les rotations pour voir le classement.</p>';
-    return `<div class="card"><table><tr><th>#</th><th>Joueur</th><th>V</th><th>J</th><th>+/-</th></tr>
-      ${list.map((x, i) => `<tr><td>${i + 1}</td><td>${name(x.id)}</td><td>${x.wins}</td><td>${x.played}</td><td>${x.diff}</td></tr>`).join('')}</table></div>`;
+    // Rang partagé en cas d'égalité parfaite (victoires et différence).
+    list.forEach((x, i) => { const p = list[i - 1]; x.rank = p && p.wins === x.wins && p.diff === x.diff ? p.rank : i + 1; });
+    const medal = r => ['🥇', '🥈', '🥉'][r - 1] || '';
+    const fmt = d => (d > 0 ? '+' : '') + d;
+    const maxWins = Math.max(1, ...list.map(x => x.wins));
+
+    const top = list.slice(0, 3), rest = list.slice(3);
+    const order = top.length === 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : top;
+    const podium = `<div class="podium">${order.map(x => `
+      <div class="step r${Math.min(x.rank, 3)}">
+        <div class="medal">${medal(x.rank)}</div>
+        <div class="pname">${name(x.id)}</div>
+        <div class="pstat">${x.wins} V · ${x.played} J</div>
+        <div class="block">${x.rank}</div>
+      </div>`).join('')}</div>`;
+
+    const restRows = rest.map(x => `
+      <div class="rank-row">
+        <span class="pos">${x.rank}</span>
+        <div class="who2"><div class="n">${name(x.id)}</div>
+          <div class="bar"><span style="width:${Math.round(100 * x.wins / maxWins)}%"></span></div></div>
+        <div class="nums"><b>${x.wins} V</b><span class="muted">${x.played} J · ${fmt(x.diff)}</span></div>
+      </div>`).join('');
+    return `${podium}${rest.length ? `<div class="card">${restRows}</div>` : ''}
+      <p class="muted center">V = victoires, J = matchs joués, écart = différence de points. Classement : victoires, puis différence de points.</p>`;
   }
 
   function doDraw(replaceLast) {

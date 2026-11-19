@@ -1,0 +1,30 @@
+# Tournoi de badminton
+
+Web app (PWA) pour organiser des tournois de double avec changement de paires à chaque rotation.
+Aucun serveur : les données restent dans le navigateur du téléphone, et l'app fonctionne hors-ligne après la première visite.
+
+## Utilisation
+1. **Joueurs** : ajouter/supprimer, choisir le niveau (Débutant / Intermédiaire / Confirmé), décocher les absents.
+2. **Rotations** : « Nouvelle rotation » tire 3 matchs simultanés (2 contre 2) sur 3 terrains.
+   - Les paires déjà formées sont évitées en priorité, puis les adversaires déjà rencontrés.
+   - Les équipes et les terrains sont équilibrés selon le niveau.
+   - Plus de 12 joueurs : ceux qui ont le moins joué passent en premier, les autres se reposent.
+   - Moins de 12 joueurs : moins de terrains utilisés.
+   - Score (saisie après le match) : choisir « Sets par match » (1 set, ou 2 gagnants = 3 sets max) et « Points par set » (15, 21 ou Libre), puis « Saisir le score ». Pour chaque set : toucher l'équipe gagnante, puis les points de l'équipe perdante.
+     Le score du gagnant est déduit : 15 (ou 21), ou perdant + 2 en prolongation, plafonné à 21 (ou 30). Ex. perdante 9 → 15-9 ; 19 → 21-19 ; 20 → 21-20.
+     Le set suivant apparaît si besoin (jamais en mode « 1 set »). « Modifier » efface un set. En mode Libre, on tape les deux scores et on ajoute les sets avec « + Set suivant ».
+3. **Classement** : sets gagnés puis différence de points (si scores saisis).
+
+## Tests
+```
+node --test tests/*.test.js
+```
+
+## Déploiement (GitHub Pages)
+Le workflow `.github/workflows/pages.yml` lance les tests puis publie le site à chaque push sur `master`.
+Une seule fois : sur GitHub, *Settings → Pages → Source : GitHub Actions*. Le premier déploiement a lieu au push suivant
+(ou via *Actions → Déploiement GitHub Pages → Run workflow*). L'adresse est affichée dans le job `deploy`
+(du type `https://<utilisateur>.github.io/<dépôt>/`).
+Ouvrir l'URL sur Android avec Chrome, puis menu ⋮ → « Ajouter à l'écran d'accueil ».
+
+Test en local : `python3 -m http.server 8000` puis http://localhost:8000.
